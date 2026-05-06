@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-and-package:
+    name: Test and package extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-xml zip unzip libxml2-utils
+
+      - name: Install frontend dependencies
+        run: npm ci --ignore-scripts --legacy-peer-deps
+
+      - name: Validate PHP syntax
+        run: |
+          find plib htdocs \( -name '*.php' -o -name '*.phtml' \) -print0 \
+            | sort -z \
+            | xargs -0 -n1 php -l
+
+      - name: Run frontend and docs tests
+        run: npm test
+
+      - name: Validate extension metadata
+        run: |
+          xmllint --noout meta.xml
+          php -r '
+          $xml = simplexml_load_file("meta.xml");
+          if (!$xml) {
+              fwrite(STDERR, "meta.xml is not valid XML\n");
+              exit(1);
+          }
+          foreach (["name", "version", "vendor"] as $field) {
+              if (trim((string) $xml->{$field}) === "") {
+                  fwrite(STDERR, "Missing meta.xml field: {$field}\n");
+                  exit(1);
+              }
+          }
+          echo "Extension: " . (string) $xml->name . " v" . (string) $xml->version . PHP_EOL;
+          '
+          node -e "JSON.parse(require('fs').readFileSync('packaging/manifest.json', 'utf8'))"
+
+      - name: Validate shell scripts
+        run: |
+          sh -n packaging/build.sh
+          sh -n sbin/pm2-helper
+
+      - name: Build Plesk extension ZIP
+        run: |
+          ./packaging/build.sh
+          version="$(php -r '$xml = simplexml_load_file("meta.xml"); echo trim((string) $xml->version);')"
+          zip -T "node-manager-pm2-${version}.zip"
+          cp "node-manager-pm2-${version}.zip" node-manager-pm2.zip
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-manager-pm2-package
+          path: |
+            node-manager-pm2-*.zip
+            node-manager-pm2.zip

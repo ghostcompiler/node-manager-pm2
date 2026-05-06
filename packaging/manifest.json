@@ -1,0 +1,10 @@
+{
+  "id": "node-manager-pm2",
+  "name": "Node Manager (PM2)",
+  "version": "1.0.0",
+  "release": "1",
+  "entry": "htdocs/index.php",
+  "minimumPlesk": "18.0.34",
+  "php": ">=7.2",
+  "linuxOnly": true
+}

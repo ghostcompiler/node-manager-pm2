@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Node Manager (PM2) for Plesk | Documentation</title>
+  <meta name="description" content="Complete documentation for Node Manager (PM2), a Plesk extension for managing Node.js and PM2 applications with runtime setup, logs, environment variables, deployment, ecosystem editing, metrics, backups, and domain-scoped access.">
+  <meta name="keywords" content="Node Manager PM2, Plesk PM2 extension, Plesk Node.js process manager, PM2 logs Plesk, PM2 ecosystem editor, Node.js SSR Plesk, Plesk extension">
+  <meta name="author" content="Ghost Compiler">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="application-name" content="Node Manager (PM2)">
+  <link rel="canonical" href="https://ghostcompiler.github.io/node-manager-pm2/">
+  <link rel="icon" href="https://assets.ghostcompiler.in/logo.png">
+  <link rel="apple-touch-icon" href="https://assets.ghostcompiler.in/logo.png">
+  <meta name="theme-color" content="#1677a3">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Node Manager (PM2)">
+  <meta property="og:title" content="Node Manager (PM2) for Plesk">
+  <meta property="og:description" content="Manage PM2 apps from Plesk with domain-scoped access, runtime setup, live logs, deployments, ecosystem editing, metrics, backups, and safe file selection.">
+  <meta property="og:url" content="https://ghostcompiler.github.io/node-manager-pm2/">
+  <meta property="og:image" content="https://ghostcompiler.github.io/node-manager-pm2/screenshots/home_dark.png">
+  <meta property="og:image:alt" content="Node Manager PM2 dashboard in Plesk dark theme">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Node Manager (PM2) for Plesk">
+  <meta name="twitter:description" content="Create, control, deploy, monitor, and troubleshoot PM2 applications directly from Plesk.">
+  <meta name="twitter:image" content="https://ghostcompiler.github.io/node-manager-pm2/screenshots/home_dark.png">
+  <meta name="twitter:image:alt" content="Node Manager PM2 dashboard in Plesk dark theme">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Node Manager (PM2) for Plesk",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, Plesk",
+    "description": "A Plesk extension for managing Node.js applications with PM2, including runtime detection, process controls, logs, deployment, ecosystem editing, metrics, backups, and scoped access.",
+    "url": "https://ghostcompiler.github.io/node-manager-pm2/",
+    "downloadUrl": "https://github.com/ghostcompiler/node-manager-pm2/releases/download/latest/node-manager-pm2.zip",
+    "softwareVersion": "1.0.0",
+    "author": {
+      "@type": "Organization",
+      "name": "Ghost Compiler",
+      "url": "https://github.com/ghostcompiler",
+      "email": "hello@ghostcompiler.in"
+    },
+    "codeRepository": "https://github.com/ghostcompiler/node-manager-pm2",
+    "image": "https://ghostcompiler.github.io/node-manager-pm2/screenshots/home_dark.png",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --ink: #142033;
+      --muted: #617083;
+      --line: #d9e2ec;
+      --panel: #fff;
+      --panel-2: #eef5f9;
+      --accent: #1677a3;
+      --accent-2: #2563eb;
+      --green: #528b2e;
+      --code: #111827;
+      --code-ink: #d1fae5;
+      --shadow: 0 18px 48px rgba(15, 23, 42, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 16px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    code,
+    pre {
+      font-family: Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(217, 226, 236, .88);
+      background: rgba(246, 248, 251, .94);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+      color: var(--ink);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: flex-end;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-links a {
+      color: #334155;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 850;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      border-color: #aebdca;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 690px;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      color: #fff;
+      background: #111827;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(6, 15, 27, .96) 0%, rgba(6, 15, 27, .78) 44%, rgba(6, 15, 27, .20) 100%),
+        url("screenshots/home_dark.png") center / cover no-repeat;
+      transform: scale(1.02);
+    }
+
+    .hero-inner {
+      position: relative;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 110px 0 80px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #85d7ff;
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 790px;
+      margin: 0;
+      font-size: clamp(42px, 8vw, 82px);
+      font-weight: 950;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 900;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 850;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+      margin: 22px 0 0;
+      color: #d8e2ec;
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .hero-actions .button:not(.primary) {
+      color: #fff;
+      border-color: rgba(255, 255, 255, .28);
+      background: rgba(255, 255, 255, .10);
+    }
+
+    .stats,
+    .grid,
+    .feature-grid,
+    .shot-grid,
+    .option-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 40px;
+    }
+
+    .stat,
+    .card,
+    .option,
+    .shot {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, .03);
+    }
+
+    .stat {
+      padding: 18px;
+      color: #fff;
+      border-color: rgba(255, 255, 255, .2);
+      background: rgba(255, 255, 255, .10);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: #d8e2ec;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .section {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 74px 0;
+    }
+
+    .section.lead {
+      padding-top: 64px;
+    }
+
+    .section-copy {
+      max-width: 820px;
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: 1.05fr .95fr;
+      align-items: start;
+    }
+
+    .feature-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .option-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card,
+    .option {
+      padding: 22px;
+    }
+
+    .card p,
+    .option p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .card ul,
+    .option ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .showcase {
+      width: 100%;
+      padding: 86px 0;
+      color: #f9fafb;
+      background: #111827;
+    }
+
+    .showcase-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .showcase h2 {
+      max-width: 760px;
+      color: #fff;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 1.05;
+    }
+
+    .showcase .section-copy {
+      color: #b8c4d1;
+    }
+
+    .slider-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 22px;
+      align-items: start;
+      margin-top: 34px;
+    }
+
+    .compare {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 8px;
+      background: #0b1220;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .34);
+      aspect-ratio: 3420 / 1908;
+    }
+
+    .compare img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .compare .light-img {
+      clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0);
+    }
+
+    .compare input[type="range"] {
+      position: absolute;
+      inset: auto 18px 18px;
+      z-index: 4;
+      width: calc(100% - 36px);
+      accent-color: #2dd4bf;
+    }
+
+    .split-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--split, 50%);
+      z-index: 3;
+      width: 2px;
+      background: #2dd4bf;
+      box-shadow: 0 0 0 1px rgba(17, 24, 39, .55);
+    }
+
+    .split-line::after {
+      content: "Light | Dark";
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #10212b;
+      background: #d9fff8;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .thumbs {
+      display: grid;
+      gap: 10px;
+    }
+
+    .thumbs button {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 6px;
+      color: #dbe7f4;
+      background: rgba(255, 255, 255, .08);
+      font: inherit;
+      font-weight: 800;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .thumbs button.active {
+      color: #052f2b;
+      border-color: #2dd4bf;
+      background: #99f6e4;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 14px;
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding: 18px 18px 18px 58px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--accent);
+      font-weight: 900;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 16px 0 0;
+      padding: 16px;
+      border-radius: 8px;
+      color: var(--code-ink);
+      background: var(--code);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .note {
+      padding: 18px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: #334155;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0;
+      color: var(--muted);
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 0;
+      }
+
+      .stats,
+      .grid.two,
+      .feature-grid,
+      .option-grid,
+      .slider-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 620px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="#top">
+        <img src="https://assets.ghostcompiler.in/logo.png" alt="Ghost Compiler logo">
+        <span>Node Manager (PM2)</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#options">Options</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/ghostcompiler/node-manager-pm2">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">Plesk extension for PM2 applications</p>
+        <h1>Manage Node.js PM2 apps from Plesk without SSH.</h1>
+        <p class="hero-copy">Create, start, stop, reload, deploy, inspect logs, edit ecosystem configs, track metrics, and keep customers safely scoped to their own domains.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#install">Install latest package</a>
+          <a class="button" href="#options">View all options</a>
+          <a class="button" href="https://github.com/ghostcompiler/node-manager-pm2">Open repository</a>
+        </div>
+        <div class="stats" aria-label="Key capabilities">
+          <div class="stat"><strong>PM2</strong><span>Process control</span></div>
+          <div class="stat"><strong>Logs</strong><span>stdout and stderr</span></div>
+          <div class="stat"><strong>Deploy</strong><span>Git and npm workflow</span></div>
+          <div class="stat"><strong>Scoped</strong><span>Admin, reseller, customer</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section lead" id="overview">
+      <div class="grid two">
+        <div>
+          <p class="kicker">Overview</p>
+          <h2>Built for hosted Node.js workloads in Plesk.</h2>
+          <p class="section-copy">Node Manager (PM2) gives Plesk administrators, resellers, and customers a domain-aware interface for PM2 applications. It is aimed at SSR apps, API servers, websocket services, queues, bots, and other long-running Node.js processes.</p>
+          <p class="section-copy">The extension validates paths against the selected domain, runs PM2 commands with the domain environment where supported, and stores metadata, secrets, metrics, backups, and webhook tokens in the Plesk module data area.</p>
+        </div>
+        <div class="card">
+          <h3>Typical applications</h3>
+          <ul>
+            <li>Laravel Inertia SSR servers.</li>
+            <li>Next.js, Nuxt, Remix, Express, Fastify, and custom Node servers.</li>
+            <li>Queue consumers, webhook workers, bots, schedulers, and websocket gateways.</li>
+            <li>Customer-managed PM2 apps inside a locked subscription root.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <p class="kicker">Features</p>
+      <h2>Everything exposed by the extension.</h2>
+      <p class="section-copy">The UI is organized around a domain selector, process list, runtime setup, settings, backups, and process detail drawers. Permissions decide which users can see logs, control processes, or manage application configuration.</p>
+      <div class="feature-grid">
+        <div class="card"><h3>Process manager</h3><p>List PM2 apps per domain, view status, CPU, memory, restarts, instances, script path, working directory, and run control actions.</p></div>
+        <div class="card"><h3>Create process</h3><p>Create PM2 apps with script path, working directory, environment name, instances, restart policy, Git metadata, and optional restart limits.</p></div>
+        <div class="card"><h3>Runtime setup</h3><p>Detect Node.js, npm, PM2, Git, binary paths, versions, PM2 home, and install or update PM2 when the user has permission.</p></div>
+        <div class="card"><h3>Logs drawer</h3><p>View stdout or stderr, refresh live logs, clear logs by truncating files, and download log files.</p></div>
+        <div class="card"><h3>Environment</h3><p>Add and delete environment variables, mark values as secret, and keep process environment values stored with the managed app.</p></div>
+        <div class="card"><h3>Deployment</h3><p>Pull Git changes, optionally run npm install, install production dependencies only, reload without downtime, and enable tokenized webhooks.</p></div>
+        <div class="card"><h3>Ecosystem editor</h3><p>Edit the generated PM2 ecosystem file in a Plesk CodeEditor drawer, save changes, or save and start the ecosystem.</p></div>
+        <div class="card"><h3>Metrics</h3><p>Graph CPU and memory usage, show recent samples, and browse metric history with five-row pagination by default.</p></div>
+        <div class="card"><h3>Backups</h3><p>Create, list, restore, and delete backups for extension-managed PM2 metadata.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="options">
+      <p class="kicker">Option reference</p>
+      <h2>Every option available in the UI.</h2>
+      <div class="option-grid">
+        <div class="option">
+          <h3>Top actions</h3>
+          <ul>
+            <li><strong>Info</strong>: opens extension information, version, creator, repository, paths, permissions, hooks, runtime notes, and support links.</li>
+            <li><strong>Refresh</strong>: reloads runtime or process data for the selected domain.</li>
+            <li><strong>New Process</strong>: opens the create process page when runtime is ready and the user can manage apps.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Domain card</h3>
+          <ul>
+            <li><strong>Domain</strong>: selects the target subscription/domain when not locked by Plesk context.</li>
+            <li><strong>Subscription user</strong>: shows the system user PM2 commands run as.</li>
+            <li><strong>Application root</strong>: base path for relative script and working-directory values.</li>
+            <li><strong>Permissions</strong>: shows Access, Logs, Control, or Manage capability.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Processes tab</h3>
+          <ul>
+            <li><strong>List row</strong>: opens the process drawer.</li>
+            <li><strong>Start / Stop</strong>: controls stopped or online processes.</li>
+            <li><strong>Restart</strong>: restarts a PM2 process.</li>
+            <li><strong>Reload</strong>: performs a PM2 reload where available.</li>
+            <li><strong>Scale up / Scale down</strong>: changes instance count.</li>
+            <li><strong>Delete</strong>: removes an extension-managed process.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Create process</h3>
+          <ul>
+            <li><strong>Name</strong>: display and PM2 process name.</li>
+            <li><strong>Script path</strong>: relative or absolute script inside the selected domain root.</li>
+            <li><strong>Working directory</strong>: process current working directory.</li>
+            <li><strong>Environment</strong>: PM2 environment name, usually production.</li>
+            <li><strong>Instances</strong>: process instance count.</li>
+            <li><strong>Max restarts</strong>: optional restart ceiling.</li>
+            <li><strong>Restart delay</strong>: optional delay in milliseconds.</li>
+            <li><strong>Git repository</strong>: optional repository URL for deployment.</li>
+            <li><strong>Git branch</strong>: branch used by deployment.</li>
+            <li><strong>Autorestart if the process exits</strong>: PM2 autorestart toggle.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>File picker and editor</h3>
+          <ul>
+            <li><strong>Document root</strong>: returns to the domain root.</li>
+            <li><strong>Up</strong>: moves up only while staying inside the domain root.</li>
+            <li><strong>Open</strong>: opens a directory.</li>
+            <li><strong>Select</strong>: selects a file or directory for the active field.</li>
+            <li><strong>Edit</strong>: opens supported text/code files in a Plesk Drawer with CodeEditor.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Runtime tab</h3>
+          <ul>
+            <li><strong>Use detected paths</strong>: applies detected Node.js, npm, PM2, Git, and PATH values.</li>
+            <li><strong>Install or update PM2</strong>: installs or updates PM2 for the selected runtime when permitted.</li>
+            <li><strong>Runtime table</strong>: shows Node.js, npm, PM2, and Git status, version, and path.</li>
+            <li><strong>PM2 home</strong>: shows the domain PM2 home directory.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Settings tab</h3>
+          <ul>
+            <li><strong>PM2 binary</strong>, <strong>Node.js binary</strong>, <strong>npm binary</strong>, and <strong>Git binary</strong>.</li>
+            <li><strong>Extra PATH entries</strong> for command execution.</li>
+            <li><strong>Polling interval</strong> for automatic process refresh.</li>
+            <li><strong>Max log bytes</strong> for log reads.</li>
+            <li><strong>Metrics retention days</strong>.</li>
+            <li><strong>Deployment timeout</strong>.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Backups tab</h3>
+          <ul>
+            <li><strong>Create Backup</strong>: saves a metadata backup.</li>
+            <li><strong>Restore</strong>: restores backed-up PM2 metadata.</li>
+            <li><strong>Delete</strong>: deletes a backup.</li>
+            <li><strong>List</strong>: shows file name, size, and creation time.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Logs drawer</h3>
+          <ul>
+            <li><strong>stdout / stderr</strong>: chooses the log stream.</li>
+            <li><strong>Refresh</strong>: reloads current log content.</li>
+            <li><strong>Clear</strong>: truncates the selected log stream.</li>
+            <li><strong>Download</strong>: downloads the selected log file.</li>
+            <li><strong>Size</strong>: shows the current log file size.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Env drawer</h3>
+          <ul>
+            <li><strong>Name</strong>: environment variable key.</li>
+            <li><strong>Value</strong>: environment variable value.</li>
+            <li><strong>Secret</strong>: stores and masks sensitive values.</li>
+            <li><strong>Save</strong>: adds or updates the variable.</li>
+            <li><strong>Delete</strong>: removes a variable from the managed app.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Deploy drawer</h3>
+          <ul>
+            <li><strong>npm install</strong>: runs npm install during deployment.</li>
+            <li><strong>production dependencies only</strong>: installs production dependencies only.</li>
+            <li><strong>zero-downtime reload</strong>: reloads instead of restarting when possible.</li>
+            <li><strong>Deploy Latest</strong>: runs the deployment workflow.</li>
+            <li><strong>Enable Webhook</strong> and <strong>Disable Webhook</strong>: manage tokenized deployment webhook access.</li>
+          </ul>
+        </div>
+        <div class="option">
+          <h3>Ecosystem and metrics</h3>
+          <ul>
+            <li><strong>Ecosystem Save</strong>: writes the ecosystem file.</li>
+            <li><strong>Save and Start</strong>: writes the file and starts it through PM2.</li>
+            <li><strong>Metrics chart</strong>: visualizes CPU and memory samples.</li>
+            <li><strong>Metrics table</strong>: shows five records per page by default with pagination.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="permissions">
+      <p class="kicker">Access model</p>
+      <h2>Service plan permissions and limits.</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>Permissions</h3>
+          <ul>
+            <li><strong>Access</strong>: allows the extension page for enabled subscriptions.</li>
+            <li><strong>View logs</strong>: allows stdout/stderr viewing and log download.</li>
+            <li><strong>Control processes</strong>: allows start, stop, restart, reload, and scale.</li>
+            <li><strong>Manage applications</strong>: allows create, delete, environment, deployment, ecosystem, and log clear actions.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Limits</h3>
+          <p>Service plans can set the maximum number of PM2 applications. Use a non-zero limit for subscriptions that may create processes. Admin users can manage all enabled domains; resellers and customers stay restricted to domains they can access in Plesk.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase" id="screenshots">
+      <div class="showcase-inner">
+        <p class="kicker">Screenshots</p>
+        <h2>Light and dark theme screenshots.</h2>
+        <p class="section-copy">Pick a screen, then drag the handle to compare the Plesk light and dark appearances.</p>
+        <div class="slider-shell">
+          <div class="compare" id="compare" style="--split: 50%">
+            <img id="darkShot" src="screenshots/home_dark.png" alt="Node Manager PM2 dashboard dark theme">
+            <img id="lightShot" class="light-img" src="screenshots/home_light.png" alt="Node Manager PM2 dashboard light theme">
+            <div class="split-line" aria-hidden="true"></div>
+            <input id="themeRange" type="range" min="0" max="100" value="50" aria-label="Compare light and dark theme screenshots">
+          </div>
+          <div class="thumbs" aria-label="Screenshot selector">
+            <button class="active" type="button" data-view="home" data-label="Dashboard">Dashboard</button>
+            <button type="button" data-view="process" data-label="Process List">Process List</button>
+            <button type="button" data-view="add" data-label="Create Process">Create Process</button>
+            <button type="button" data-view="file_selection" data-label="File Picker">File Picker</button>
+            <button type="button" data-view="edit" data-label="File Editor">File Editor</button>
+            <button type="button" data-view="runtime" data-label="Runtime">Runtime</button>
+            <button type="button" data-view="setting" data-label="Settings">Settings</button>
+            <button type="button" data-view="backup" data-label="Backups">Backups</button>
+            <button type="button" data-view="log" data-label="Logs">Logs</button>
+            <button type="button" data-view="env" data-label="Environment">Environment</button>
+            <button type="button" data-view="deploy" data-label="Deploy">Deploy</button>
+            <button type="button" data-view="ecosystem" data-label="Ecosystem">Ecosystem</button>
+            <button type="button" data-view="matric" data-label="Metrics">Metrics</button>
+            <button type="button" data-view="action" data-label="Actions">Actions</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <p class="kicker">Install</p>
+      <h2>Install or build the extension.</h2>
+      <p class="section-copy">Use the rolling latest package for most installations, or build the ZIP locally from the repository.</p>
+      <pre><code>plesk bin extension --install-url https://github.com/ghostcompiler/node-manager-pm2/releases/download/latest/node-manager-pm2.zip</code></pre>
+      <pre><code>./packaging/build.sh
+plesk bin extension --install node-manager-pm2-1.0.0.zip</code></pre>
+      <ol class="steps">
+        <li>Open the service plan or subscription in Plesk.</li>
+        <li>Enable Node Manager (PM2) access and the needed logs, control, and manage permissions.</li>
+        <li>Set Maximum PM2 applications to a non-zero value for subscriptions that can create apps.</li>
+        <li>Open Node Manager (PM2), select a domain, and review the Runtime tab.</li>
+        <li>Apply detected paths or install PM2, then create the first process.</li>
+      </ol>
+    </section>
+
+    <section class="section" id="troubleshooting">
+      <p class="kicker">Troubleshooting</p>
+      <h2>Useful paths and logs.</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>Panel logs</h3>
+          <pre><code>tail -n 200 /var/log/plesk/panel.log
+tail -n 200 /var/log/sw-cp-server/error_log
+tail -n 200 /usr/local/psa/var/modules/node-manager-pm2/logs/node-manager-pm2.log</code></pre>
+        </div>
+        <div class="card">
+          <h3>Important data</h3>
+          <ul>
+            <li>PM2 home: <code>/var/www/vhosts/&lt;subscription&gt;/.pm2</code></li>
+            <li>Module data: <code>/usr/local/psa/var/modules/node-manager-pm2</code></li>
+            <li>Deployment webhook: <code>htdocs/public/webhook.php</code></li>
+            <li>Frontend bundle: <code>htdocs/dist/node-manager-pm2-ui.js</code></li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">Managed file selection and editing are intentionally restricted to the selected domain root. This prevents customers from browsing or editing another subscription.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>Node Manager (PM2) for Plesk by Ghost Compiler</span>
+      <span><a href="mailto:hello@ghostcompiler.in">hello@ghostcompiler.in</a> · <a href="https://github.com/ghostcompiler/node-manager-pm2">GitHub</a></span>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var compare = document.getElementById('compare');
+      var range = document.getElementById('themeRange');
+      var light = document.getElementById('lightShot');
+      var dark = document.getElementById('darkShot');
+      var buttons = Array.prototype.slice.call(document.querySelectorAll('.thumbs button'));
+
+      function setSplit(value) {
+        compare.style.setProperty('--split', value + '%');
+      }
+
+      function setView(button) {
+        var view = button.getAttribute('data-view');
+        var label = button.getAttribute('data-label');
+        light.src = 'screenshots/' + view + '_light.png';
+        dark.src = 'screenshots/' + view + '_dark.png';
+        light.alt = 'Node Manager PM2 ' + label + ' light theme';
+        dark.alt = 'Node Manager PM2 ' + label + ' dark theme';
+        buttons.forEach(function (item) {
+          item.classList.toggle('active', item === button);
+        });
+      }
+
+      if (!compare || !range || !light || !dark) {
+        return;
+      }
+
+      range.addEventListener('input', function () {
+        setSplit(range.value);
+      });
+
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          setView(button);
+        });
+      });
+
+      setSplit(range.value);
+    }());
+  </script>
+</body>
+</html>

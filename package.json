@@ -1,0 +1,27 @@
+{
+  "name": "node-manager-pm2-plesk-extension",
+  "version": "1.0.0",
+  "description": "Node Manager (PM2) Plesk extension UI bundle.",
+  "private": true,
+  "scripts": {
+    "prepare": "npm run build",
+    "dev": "webpack --watch --config frontend/webpack.config.cjs",
+    "build": "npm run build:ui",
+    "build:ui": "node frontend/build.cjs",
+    "test": "npm run test:build && npm run test:docs",
+    "test:build": "npm run build",
+    "test:docs": "node scripts/validate-docs.cjs"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "resolutions": {
+    "cheerio": "1.0.0-rc.12"
+  },
+  "overrides": {
+    "cheerio": "1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@plesk/plesk-ext-sdk": "^0.8.0",
+    "ajv": "^8.20.0"
+  }
+}

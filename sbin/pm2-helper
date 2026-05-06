@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+ACTION="${1:-}"
+NPM_BIN="${2:-npm}"
+
+case "$ACTION" in
+  install)
+    NPM_DIR=$(dirname "$NPM_BIN")
+    export PATH="$NPM_DIR:$PATH"
+    exec "$NPM_BIN" install --global pm2@latest
+    ;;
+  *)
+    echo "Usage: pm2-helper install [npm-bin]" >&2
+    exit 2
+    ;;
+esac

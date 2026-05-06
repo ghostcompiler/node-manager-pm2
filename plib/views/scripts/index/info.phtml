@@ -1,0 +1,46 @@
+<?php
+$extensionInfo = !empty($this->extensionInfo) ? $this->extensionInfo : [];
+$backUrl = !empty($this->backUrl) ? $this->backUrl : pm_Context::getActionUrl('index', 'index');
+$name = isset($extensionInfo['name']) ? $extensionInfo['name'] : 'Node Manager (PM2)';
+$version = isset($extensionInfo['version']) ? $extensionInfo['version'] : '1.0.0';
+$creator = isset($extensionInfo['creator']) ? $extensionInfo['creator'] : 'Ghost Compiler';
+$email = isset($extensionInfo['email']) ? $extensionInfo['email'] : 'hello@ghostcompiler.in';
+$github = isset($extensionInfo['github']) ? $extensionInfo['github'] : 'node-manager-pm2';
+$githubUrl = isset($extensionInfo['githubUrl']) ? $extensionInfo['githubUrl'] : 'https://github.com/ghostcompiler/node-manager-pm2';
+$icon = isset($extensionInfo['icon']) ? $extensionInfo['icon'] : '';
+?>
+
+<div class="nm-info-page">
+    <div class="nm-info-page-head">
+        <div class="nm-info-page-brand">
+            <?php if ($icon !== ''): ?>
+                <img src="<?php echo $this->escape($icon); ?>" alt="">
+            <?php endif; ?>
+            <div>
+                <span>Extension Information</span>
+                <h1><?php echo $this->escape($name); ?></h1>
+                <p>Domain-scoped PM2 process management for Plesk administrators, resellers, and customers.</p>
+            </div>
+        </div>
+        <a class="btn" href="<?php echo $this->escape($backUrl); ?>">Back</a>
+    </div>
+
+    <div class="nm-info-page-grid">
+        <div>
+            <span>Version</span>
+            <strong><?php echo $this->escape('v' . $version); ?></strong>
+        </div>
+        <div>
+            <span>Creator</span>
+            <strong><?php echo $this->escape($creator); ?></strong>
+        </div>
+        <div>
+            <span>Email</span>
+            <a href="mailto:<?php echo $this->escape($email); ?>"><?php echo $this->escape($email); ?></a>
+        </div>
+        <div>
+            <span>GitHub</span>
+            <a href="<?php echo $this->escape($githubUrl); ?>" target="_blank" rel="noopener noreferrer"><?php echo $this->escape($github); ?></a>
+        </div>
+    </div>
+</div>

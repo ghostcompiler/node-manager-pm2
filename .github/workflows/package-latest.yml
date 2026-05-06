@@ -1,0 +1,103 @@
+name: Package Latest
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: package-latest
+  cancel-in-progress: false
+
+jobs:
+  package-latest:
+    name: Build latest install package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-xml zip unzip libxml2-utils
+          gh --version
+
+      - name: Install frontend dependencies
+        run: npm ci --ignore-scripts --legacy-peer-deps
+
+      - name: Read extension version
+        id: version
+        run: |
+          version="$(php -r '$xml = simplexml_load_file("meta.xml"); echo trim((string) $xml->version);')"
+          if [ -z "$version" ]; then
+            echo "Unable to read version from meta.xml" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate PHP syntax
+        run: |
+          find plib htdocs \( -name '*.php' -o -name '*.phtml' \) -print0 \
+            | sort -z \
+            | xargs -0 -n1 php -l
+
+      - name: Validate package inputs
+        run: |
+          npm test
+          xmllint --noout meta.xml
+          node -e "JSON.parse(require('fs').readFileSync('packaging/manifest.json', 'utf8'))"
+          sh -n packaging/build.sh
+          sh -n sbin/pm2-helper
+
+      - name: Build latest ZIP
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          ./packaging/build.sh
+          zip -T "node-manager-pm2-${version}.zip"
+          cp "node-manager-pm2-${version}.zip" node-manager-pm2.zip
+
+      - name: Prepare latest release notes
+        run: |
+          cat > latest-release-notes.md <<EOF
+          Rolling latest package for Node Manager (PM2).
+
+          Version: ${{ steps.version.outputs.version }}
+          Commit: ${GITHUB_SHA}
+
+          Install with:
+
+          \`\`\`sh
+          plesk bin extension --install-url https://github.com/${GITHUB_REPOSITORY}/releases/download/latest/node-manager-pm2.zip
+          \`\`\`
+          EOF
+
+      - name: Move latest tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f latest "$GITHUB_SHA"
+          git push origin refs/tags/latest --force
+
+      - name: Publish latest package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          title="Node Manager (PM2) latest (v${version})"
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest node-manager-pm2.zip --clobber
+            gh release edit latest --title "$title" --notes-file latest-release-notes.md --prerelease
+          else
+            gh release create latest node-manager-pm2.zip \
+              --title "$title" \
+              --notes-file latest-release-notes.md \
+              --prerelease
+          fi

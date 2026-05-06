@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<module>
+  <id>node-manager-pm2</id>
+  <name>Node Manager (PM2)</name>
+  <description>Manage Node.js applications with PM2 directly from Plesk, including processes, logs, metrics, environment variables, deployments, and clustering.</description>
+  <category>developer</category>
+  <category>monitoring</category>
+  <category>server_tool</category>
+  <category>client_tool</category>
+  <version>1.0.0</version>
+  <release>1</release>
+  <vendor>Ghost Compiler</vendor>
+  <url>https://github.com/ghostcompiler/node-manager-pm2</url>
+  <help_url>https://github.com/ghostcompiler/node-manager-pm2/tree/main/docs</help_url>
+  <support_url>https://github.com/ghostcompiler/node-manager-pm2/issues</support_url>
+  <plesk_min_version>18.0.34</plesk_min_version>
+</module>

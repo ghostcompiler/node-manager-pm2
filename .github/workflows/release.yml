@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v1.0.17"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-xml zip unzip libxml2-utils
+          gh --version
+
+      - name: Install frontend dependencies
+        run: npm ci --ignore-scripts --legacy-peer-deps
+
+      - name: Resolve release version
+        id: version
+        run: |
+          meta_version="$(php -r '$xml = simplexml_load_file("meta.xml"); echo trim((string) $xml->version);')"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+          tag_version="${tag#v}"
+          if [ "$meta_version" != "$tag_version" ]; then
+            echo "meta.xml version ($meta_version) must match release tag ($tag)." >&2
+            exit 1
+          fi
+          echo "version=$meta_version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$meta_version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate PHP syntax
+        run: |
+          find plib htdocs \( -name '*.php' -o -name '*.phtml' \) -print0 \
+            | sort -z \
+            | xargs -0 -n1 php -l
+
+      - name: Validate package inputs
+        run: |
+          npm test
+          xmllint --noout meta.xml
+          node -e "JSON.parse(require('fs').readFileSync('packaging/manifest.json', 'utf8'))"
+          sh -n packaging/build.sh
+          sh -n sbin/pm2-helper
+
+      - name: Build release ZIP asset
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          ./packaging/build.sh
+          zip -T "node-manager-pm2-${version}.zip"
+
+      - name: Generate release notes
+        run: |
+          awk 'NR == 1 { next } /^## / && seen { exit } /^## / { seen = 1; next } seen { print }' CHANGES.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Node Manager (PM2) ${{ steps.version.outputs.tag }}" > release-notes.md
+          fi
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          version="${{ steps.version.outputs.version }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "node-manager-pm2-${version}.zip" --clobber
+          else
+            gh release create "$tag" "node-manager-pm2-${version}.zip" \
+              --title "$tag" \
+              --notes-file release-notes.md
+          fi
