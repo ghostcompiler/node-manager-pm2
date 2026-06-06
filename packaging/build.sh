@@ -2,9 +2,10 @@
 set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-OUT="${ROOT_DIR}/node-manager-pm2-1.0.0.zip"
 
 cd "$ROOT_DIR"
+VERSION="$(php -r '$xml = simplexml_load_file("meta.xml"); echo trim((string) $xml->version);')"
+OUT="${ROOT_DIR}/node-manager-pm2-${VERSION}.zip"
 if command -v npm >/dev/null 2>&1; then
   if [ ! -d node_modules ]; then
     if [ -f package-lock.json ]; then
