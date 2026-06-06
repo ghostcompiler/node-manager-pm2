@@ -1,7 +1,5 @@
-# Node Manager (PM2) for Plesk
-
 <p align="center">
-  <img src="https://assets.ghostcompiler.in/logo.png" alt="Ghost Compiler" width="180">
+  <img src="https://res.cloudinary.com/djgvfl1tv/image/upload/v1780666791/logo_mqnqn4.png" alt="Ghost Compiler" width="180">
 </p>
 
 <h1 align="center">Node Manager (PM2) for Plesk</h1>
@@ -11,26 +9,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Plesk-Extension-52A8E8?style=for-the-badge&logo=plesk&logoColor=white" alt="Plesk Extension">
+  <img src="https://img.shields.io/badge/Plesk-Extension-52BBE6?style=for-the-badge&logo=plesk&logoColor=white" alt="Plesk Extension">
   <img src="https://img.shields.io/badge/PM2-Process%20Manager-2B037A?style=for-the-badge" alt="PM2">
   <img src="https://img.shields.io/badge/Node.js-SSR%20Ready-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/PHP-7.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
-  <img src="https://img.shields.io/badge/Domain%20Scoped-Secure-2563EB?style=for-the-badge" alt="Domain Scoped">
-</p>
-
-<p align="center">
-  <a href="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/ci.yml">
-    <img src="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/ci.yml/badge.svg" alt="CI">
-  </a>
-  <a href="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/release.yml">
-    <img src="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/release.yml/badge.svg" alt="Release">
-  </a>
-  <a href="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/package-latest.yml">
-    <img src="https://github.com/ghostcompiler/node-manager-pm2/actions/workflows/package-latest.yml/badge.svg" alt="Latest Package">
-  </a>
-  <img src="https://img.shields.io/badge/Creator-Ghost%20Compiler-111827?style=flat-square" alt="Creator">
-  <img src="https://img.shields.io/badge/Status-Production%20Ready-22C55E?style=flat-square" alt="Status">
-  <img src="https://img.shields.io/badge/Access-Admin%20%7C%20Reseller%20%7C%20Customer-blue?style=flat-square" alt="Access">
+  <img src="https://img.shields.io/badge/PHP-Backend-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP Backend">
+  <img src="https://img.shields.io/badge/Built%20By-Ghost%20Compiler-0F172A?style=for-the-badge" alt="Ghost Compiler">
 </p>
 
 ---
@@ -322,3 +305,18 @@ tail -n 200 /usr/local/psa/admin/logs/panel.log
 - Package configuration lives in `packaging/manifest.json` and `packaging/build.sh`.
 
 See `docs/INSTALL.md`, `docs/SECURITY.md`, `docs/API.md`, and `docs/ARCHITECTURE.md` for operational details.
+
+
+## Development Environment
+
+Built using **ServBay**
+
+<p align="left">
+  <img src="https://res.cloudinary.com/djgvfl1tv/image/upload/v1780667063/servbay_edc7jz.png" alt="ServBay" width="120">
+</p>
+
+- Mac M4 Tested
+- macOS Apple Silicon
+- Powered by ServBay
+
+---
