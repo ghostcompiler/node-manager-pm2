@@ -7,7 +7,7 @@
   <category>monitoring</category>
   <category>server_tool</category>
   <category>client_tool</category>
-  <version>1.0.0</version>
+  <version>1.0.18</version>
   <release>1</release>
   <vendor>Ghost Compiler</vendor>
   <url>https://github.com/ghostcompiler/node-manager-pm2</url>
