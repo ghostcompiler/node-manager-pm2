@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      manual_downloads:
+        description: "Manual download count to add to total"
+        required: false
+        default: "0"
 
 permissions:
   contents: write
@@ -96,10 +101,16 @@ jobs:
           CURRENT_COUNT=$(gh release view latest --json assets --jq '.assets[] | select(.name == "node-manager-pm2.zip") | .downloadCount' 2>/dev/null || echo 0)
           echo "Downloads of the active release before overwrite: $CURRENT_COUNT"
           
+          MANUAL_ADD="${{ github.event.inputs.manual_downloads }}"
+          if [ -z "$MANUAL_ADD" ]; then
+            MANUAL_ADD=0
+          fi
+          echo "Manual downloads to add: $MANUAL_ADD"
+          
           PREVIOUS_TOTAL=$(jq '.total_downloads // 0' stats.json 2>/dev/null || echo 0)
           echo "Previous total downloads: $PREVIOUS_TOTAL"
           
-          NEW_TOTAL=$((PREVIOUS_TOTAL + CURRENT_COUNT))
+          NEW_TOTAL=$((PREVIOUS_TOTAL + CURRENT_COUNT + MANUAL_ADD))
           echo "New calculated total downloads: $NEW_TOTAL"
           
           jq --arg new_total "$NEW_TOTAL" '.total_downloads = ($new_total | tonumber)' stats.json > stats.json.tmp && mv stats.json.tmp stats.json
