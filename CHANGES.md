@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.19-1
+
+- Added persistent download statistics tracking for the latest release.
+- Added dynamic Shields.io downloads badge to the README.
+
 ## 1.0.18-1
 
 - Replaced fragile Plesk `Grid`, `Item`, `Tabs`, and toolbar layouts on the

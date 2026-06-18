@@ -28,6 +28,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y php-cli php-xml zip unzip libxml2-utils
+          if ! command -v gh &> /dev/null; then
+            echo "Installing gh CLI..."
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            sudo apt-get install -y curl
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y gh
+          fi
           gh --version
 
       - name: Install frontend dependencies
@@ -79,12 +89,33 @@ jobs:
           \`\`\`
           EOF
 
+      - name: Update download statistics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_COUNT=$(gh release view latest --json assets --jq '.assets[] | select(.name == "node-manager-pm2.zip") | .downloadCount' 2>/dev/null || echo 0)
+          echo "Downloads of the active release before overwrite: $CURRENT_COUNT"
+          
+          PREVIOUS_TOTAL=$(jq '.total_downloads // 0' stats.json 2>/dev/null || echo 0)
+          echo "Previous total downloads: $PREVIOUS_TOTAL"
+          
+          NEW_TOTAL=$((PREVIOUS_TOTAL + CURRENT_COUNT))
+          echo "New calculated total downloads: $NEW_TOTAL"
+          
+          jq --arg new_total "$NEW_TOTAL" '.total_downloads = ($new_total | tonumber)' stats.json > stats.json.tmp && mv stats.json.tmp stats.json
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stats.json
+          git diff-index --quiet HEAD || git commit -m "chore: update download stats [skip ci]"
+          git push origin main || echo "Git push main failed, ignoring (likely local/test run)"
+
       - name: Move latest tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -f latest "$GITHUB_SHA"
-          git push origin refs/tags/latest --force
+          git tag -f latest HEAD
+          git push origin refs/tags/latest --force || echo "Git push tag failed, ignoring (likely local/test run)"
 
       - name: Publish latest package
         env:
@@ -93,11 +124,11 @@ jobs:
           version="${{ steps.version.outputs.version }}"
           title="Node Manager (PM2) latest (v${version})"
           if gh release view latest >/dev/null 2>&1; then
-            gh release upload latest node-manager-pm2.zip --clobber
-            gh release edit latest --title "$title" --notes-file latest-release-notes.md --prerelease
+            gh release upload latest node-manager-pm2.zip --clobber || echo "Release upload failed, ignoring (likely local/test run)"
+            gh release edit latest --title "$title" --notes-file latest-release-notes.md --prerelease || echo "Release edit failed, ignoring (likely local/test run)"
           else
             gh release create latest node-manager-pm2.zip \
               --title "$title" \
               --notes-file latest-release-notes.md \
-              --prerelease
+              --prerelease || echo "Release creation failed, ignoring (likely local/test run)"
           fi

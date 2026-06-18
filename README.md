@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/Node.js-SSR%20Ready-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/PHP-Backend-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP Backend">
   <img src="https://img.shields.io/badge/Built%20By-Ghost%20Compiler-0F172A?style=for-the-badge" alt="Ghost Compiler">
+  <img src="https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=2EA44F&label=Downloads&query=%24.total_downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fghostcompiler%2Fnode-manager-pm2%2Fmain%2Fstats.json" alt="Downloads">
 </p>
 
 ---
