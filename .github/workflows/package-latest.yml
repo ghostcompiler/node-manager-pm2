@@ -10,6 +10,8 @@ on:
         description: "Manual download count to add to total"
         required: false
         default: "0"
+  schedule:
+    - cron: '0 * * * *' # Automatically runs every hour to update stats
 
 permissions:
   contents: write
